@@ -48,9 +48,10 @@ jobs:
         with:
           workload_identity_provider: projects/779178896736/locations/global/workloadIdentityPools/github-actions/providers/github
           service_account: github-actions@779178896736.iam.gserviceaccount.com
+          token_format: access_token
 
       - name: Deploy to Firebase Hosting
         run: npx -y firebase-tools deploy --only hosting --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
