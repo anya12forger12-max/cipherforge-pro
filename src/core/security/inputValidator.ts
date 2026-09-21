@@ -117,6 +117,8 @@ export class InputValidator {
       warnings.push({ code: 'NULL_BYTES', message: `${fieldName} contains null bytes`, field: fieldName, suggestion: 'Remove null bytes' });
     }
 
+    // Deliberate: control characters are blocked by design.
+    // eslint-disable-next-line no-control-regex
     const controlCharCount = (text.match(/[\x00-\x08\x0E-\x1F]/g) || []).length;
     if (controlCharCount > 0) {
       warnings.push({
@@ -171,6 +173,8 @@ export class InputValidator {
       });
     }
 
+    // Deliberate: control characters are blocked by design.
+    // eslint-disable-next-line no-control-regex
     if (/[<>:"|?*\x00-\x1f]/.test(filename)) {
       errors.push({
         code: 'INVALID_CHARS',

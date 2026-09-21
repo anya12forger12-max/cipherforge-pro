@@ -192,7 +192,7 @@ export class EnhancedCaesarCipher {
 
     // Space and punctuation frequency
     const spaceCount = (text.match(/ /g) || []).length;
-    const punctCount = (text.match(/[.,!?;:'"()\-]/g) || []).length;
+    const punctCount = (text.match(/[.,!?;:'"()-]/g) || []).length;
 
     // Find most/least common
     let mostCommon = 'E';
