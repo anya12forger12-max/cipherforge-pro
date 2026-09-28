@@ -52,7 +52,8 @@ export function FirstLaunchWizard({ isOpen, onComplete, onSkip }: FirstLaunchWiz
   const [privacy, setPrivacy] = useState({
     saveHistory: true,
     autoSave: true,
-    clearOnExit: false
+    clearOnExit: false,
+    acceptedPolicy: false
   });
 
   if (!isOpen) return null;
@@ -63,6 +64,9 @@ export function FirstLaunchWizard({ isOpen, onComplete, onSkip }: FirstLaunchWiz
 
   const next = () => {
     if (isLast) {
+      if (!privacy.acceptedPolicy) {
+        return;
+      }
       localStorage.setItem('cipherforge-onboarded', 'true');
       localStorage.setItem('cipherforge-wizard-theme', selectedTheme);
       localStorage.setItem('cipherforge-wizard-accessibility', JSON.stringify(accessibility));
@@ -236,6 +240,30 @@ export function FirstLaunchWizard({ isOpen, onComplete, onSkip }: FirstLaunchWiz
               }}>
                 CipherForge Pro is 100% offline. No data ever leaves your device.
               </div>
+              <label style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--spacing-md)',
+                padding: 'var(--spacing-md)',
+                marginBottom: 'var(--spacing-md)',
+                borderRadius: 'var(--border-radius-md)',
+                border: '1px solid var(--color-border)',
+                cursor: 'pointer',
+                textAlign: 'left'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={privacy.acceptedPolicy}
+                  onChange={e => setPrivacy({ ...privacy, acceptedPolicy: e.target.checked })}
+                  style={{ width: '18px', height: '18px', marginTop: '2px' }}
+                />
+                <div>
+                  <div style={{ fontWeight: 500 }}>Privacy Policy Consent (Required)</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+                    I explicitly accept the Privacy Policy to use CipherForge Pro. You must accept to continue.
+                  </div>
+                </div>
+              </label>
               {[
                 { key: 'saveHistory', label: 'Save History', desc: 'Remember your recent operations' },
                 { key: 'autoSave', label: 'Auto-save Workspaces', desc: 'Automatically save your work' },
@@ -313,7 +341,17 @@ export function FirstLaunchWizard({ isOpen, onComplete, onSkip }: FirstLaunchWiz
             <button onClick={onSkip} className="btn btn-secondary">
               Skip All
             </button>
-            <button onClick={next} className="btn btn-primary">
+            <button
+              onClick={() => {
+                if (isLast && !privacy.acceptedPolicy) {
+                  alert('You must explicitly accept the Privacy Policy to proceed.');
+                  return;
+                }
+                next();
+              }}
+              className="btn btn-primary"
+              style={isLast && !privacy.acceptedPolicy ? { opacity: 0.5 } : undefined}
+            >
               {isLast ? 'Get Started' : 'Next'} <ChevronRight size={16} />
             </button>
           </div>

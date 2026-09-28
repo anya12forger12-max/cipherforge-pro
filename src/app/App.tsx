@@ -16,6 +16,7 @@ import { NotificationPanel } from './components/NotificationPanel';
 import { CommandPalette } from './components/CommandPalette';
 import { StatusBar } from './components/StatusBar';
 import { FirstLaunchWizard } from './components/FirstLaunchWizard';
+import { LoginScreen } from './components/LoginScreen';
 import './App.css';
 
 type Page = 'dashboard' | 'workspace' | 'settings' | 'help' | 'visualizations' | 'projects' | 'history' | 'bookmarks' | 'reports' | 'learning' | 'security' | 'privacy' | 'recovery' | 'diagnostics';
@@ -26,6 +27,7 @@ function App() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [wizardOpen, setWizardOpen] = useState(() => !localStorage.getItem('cipherforge-onboarded'));
+  const [authenticated, setAuthenticated] = useState(false);
 
   const themeStyles = {
     '--color-primary': currentTheme.colors.primary,
@@ -157,8 +159,12 @@ function App() {
 
       <StatusBar currentPage={currentPage} isOffline={true} />
 
+      {!authenticated && (
+        <LoginScreen onAuthenticated={() => setAuthenticated(true)} />
+      )}
+
       <FirstLaunchWizard
-        isOpen={wizardOpen}
+        isOpen={wizardOpen && authenticated}
         onComplete={() => setWizardOpen(false)}
         onSkip={() => { localStorage.setItem('cipherforge-onboarded', 'true'); setWizardOpen(false); }}
       />
