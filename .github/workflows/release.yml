@@ -123,6 +123,20 @@ jobs:
             echo "EOF" >> $GITHUB_OUTPUT
           fi
 
+      - name: Package site
+        run: |
+          set -euo pipefail
+          zip -qr "cipherforge-${GITHUB_REF_NAME}.zip" dist
+          rm -rf dist
+          mkdir dist
+          mv "cipherforge-${GITHUB_REF_NAME}.zip" dist/
+
+      - name: Generate SHA256 checksums
+        run: |
+          cd dist
+          sha256sum ./* > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -134,7 +148,13 @@ jobs:
 
             ## Installation
 
-            Download the build artifact and serve the `dist/` directory with any static file server.
+            Unzip `cipherforge-${{ github.ref_name }}.zip` and serve the `dist/` directory with any static file server.
+
+            ## Verification
+
+            ```bash
+            sha256sum -c SHA256SUMS.txt
+            ```
           files: dist/*
           draft: false
           prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') || contains(github.ref_name, 'rc') }}
