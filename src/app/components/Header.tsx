@@ -7,7 +7,9 @@ import {
   Sun,
   Command,
   Maximize2,
-  Minimize2
+  Minimize2,
+  LogOut,
+  UserRound
 } from 'lucide-react';
 import { useThemeStore } from '../../themes';
 import { useState } from 'react';
@@ -15,9 +17,12 @@ import { useState } from 'react';
 interface HeaderProps {
   onToggleSidebar: () => void;
   onOpenCommandPalette: () => void;
+  /** Provided only while an account is signed in. */
+  onSignOut?: () => void;
+  signedInEmail?: string | null;
 }
 
-export function Header({ onToggleSidebar, onOpenCommandPalette }: HeaderProps) {
+export function Header({ onToggleSidebar, onOpenCommandPalette, onSignOut, signedInEmail }: HeaderProps) {
   const { currentTheme, setTheme } = useThemeStore();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -200,6 +205,47 @@ export function Header({ onToggleSidebar, onOpenCommandPalette }: HeaderProps) {
             }}
           />
         </button>
+
+        {onSignOut && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+            <span
+              title={signedInEmail ? `Signed in as ${signedInEmail}` : 'Signed in'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '0.75rem',
+                color: 'var(--color-text-secondary)',
+                maxWidth: '160px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <UserRound size={14} />
+              {signedInEmail}
+            </span>
+            <button
+              className="button-ghost"
+              onClick={onSignOut}
+              aria-label="Sign out"
+              title="Sign out"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: 'var(--spacing-sm)',
+                borderRadius: 'var(--border-radius-md)',
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--color-text)',
+                cursor: 'pointer'
+              }}
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
+        )}
 
         <button
           className="button-ghost"

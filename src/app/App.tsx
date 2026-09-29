@@ -17,6 +17,7 @@ import { CommandPalette } from './components/CommandPalette';
 import { StatusBar } from './components/StatusBar';
 import { FirstLaunchWizard } from './components/FirstLaunchWizard';
 import { LoginScreen } from './components/LoginScreen';
+import { getSignedInEmail, signOut } from '../core/security/authManager';
 import './App.css';
 
 type Page = 'dashboard' | 'workspace' | 'settings' | 'help' | 'visualizations' | 'projects' | 'history' | 'bookmarks' | 'reports' | 'learning' | 'security' | 'privacy' | 'recovery' | 'diagnostics';
@@ -27,7 +28,20 @@ function App() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [wizardOpen, setWizardOpen] = useState(() => !localStorage.getItem('cipherforge-onboarded'));
-  const [authenticated, setAuthenticated] = useState(false);
+  // The session lives in local storage, so a reload keeps the user signed in.
+  const [signedInEmail, setSignedInEmail] = useState<string | null>(() => getSignedInEmail());
+  const [authenticated, setAuthenticated] = useState(() => getSignedInEmail() !== null);
+
+  const handleAuthenticated = () => {
+    setSignedInEmail(getSignedInEmail());
+    setAuthenticated(true);
+  };
+
+  const handleSignOut = () => {
+    signOut();
+    setSignedInEmail(null);
+    setAuthenticated(false);
+  };
 
   const themeStyles = {
     '--color-primary': currentTheme.colors.primary,
@@ -136,6 +150,8 @@ function App() {
       <Header 
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+        onSignOut={authenticated ? handleSignOut : undefined}
+        signedInEmail={signedInEmail}
       />
       
       <div className="app-layout">
@@ -160,7 +176,7 @@ function App() {
       <StatusBar currentPage={currentPage} isOffline={true} />
 
       {!authenticated && (
-        <LoginScreen onAuthenticated={() => setAuthenticated(true)} />
+        <LoginScreen onAuthenticated={handleAuthenticated} />
       )}
 
       <FirstLaunchWizard

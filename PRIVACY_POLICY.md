@@ -16,12 +16,16 @@ This Privacy Policy (this "Policy") constitutes a binding legal agreement betwee
 
 ## 1. INFORMATION WE COLLECT
 
-CipherForge Pro is 100% offline. No data ever leaves your device. The application collects no personal information, requires no account, and transmits no data to any server.
+CipherForge Pro is 100% offline. No data ever leaves your device, and the application transmits nothing to any server. To keep your workspace private, the app asks you to create a **local account**: the email address you enter and a randomly salted hash of your password are stored only in this browser's local storage and are never transmitted anywhere.
 
 The only data stored locally on your device includes:
+* **Your local account:** the email address you registered with, together with a per-account random salt, a password hash derived with PBKDF2-HMAC-SHA256, and the iteration count used. Your plaintext password is never stored.
+* **Your session and consent record:** which account is currently signed in, and the date and time you accepted this Policy. Both live only on this device.
 * **Workspace configurations:** Your cipher settings, themes, and preferences.
 * **Operation history:** Records of encryption/decryption operations you perform, stored in your browser's local storage.
 * **Accessibility settings:** Your selected accessibility preferences.
+
+Signing out clears only the session. Your account record is kept so you can sign back in, and it is deleted together with everything else when you clear this application's local storage.
 
 ---
 
@@ -40,6 +44,7 @@ CipherForge Pro requests no device permissions. The application operates entirel
 ## 4. DATA SECURITY
 
 * **Local Storage Only:** All data is stored in your browser's local storage. No data is transmitted to any server.
+* **Passwords Are Never Stored:** Your password is never written to disk. Only a randomly salted PBKDF2-HMAC-SHA256 hash is kept, and the comparison on sign-in is made in constant time. WebCrypto is used where the browser provides it (an https or localhost page); on a plain-http page the app degrades to a single-pass salted SHA-256 digest, which is weaker, so prefer a secure context.
 * **No Network Requests:** The application makes zero network calls to external servers.
 * **Clear on Exit:** You may enable "Clear Data on Exit" in the Privacy Settings step of the first-launch wizard to erase all local data when closing the application.
 
@@ -60,16 +65,16 @@ CipherForge Pro requests no device permissions. The application operates entirel
 
 ## 7. USER RIGHTS (INCLUDING GDPR / CCPA COMPLIANCE)
 
-Because CipherForge Pro collects no personal data and operates entirely offline:
-* **Right to Access:** All your data is local and fully accessible to you at all times.
-* **Right to Erasure:** Clear your browser's local storage or enable "Clear Data on Exit."
-* **Right to Object:** No data is ever processed beyond your device.
+Because everything CipherForge Pro stores stays on your device:
+* **Right to Access:** All your data, including your local account record, is stored locally and fully accessible to you at all times.
+* **Right to Erasure:** Clear your browser's local storage for this application, or enable "Clear Data on Exit," to remove your account, session, and consent record.
+* **Right to Object:** No data is ever processed beyond your device, and nothing is sent to us.
 
 ---
 
 ## 8. CHILDREN'S PRIVACY
 
-CipherForge Pro is an educational cryptography toolkit. It collects no personal information and is safe for users of all ages under parental guidance.
+CipherForge Pro is an educational cryptography toolkit. It transmits no personal information to us or to any third party, because everything stays on your device. An account is required to use the app, so do not register a child's email address without a parent's permission.
 
 ---
 
@@ -88,4 +93,6 @@ GitHub: [https://github.com/anya12forger12-max/cipherforge-pro/issues](https://g
 
 ## 11. USER CONSENT & SIGN-OFF
 
-By selecting **"I explicitly accept the Privacy Policy"** during the first-launch wizard, you signify your complete understanding and consent to all terms of this Policy. If you do not accept, you will be denied access to the Application.
+By selecting **"I explicitly accept the Privacy Policy"** in the first-launch wizard, you signify your complete understanding and consent to all terms of this Policy. If you do not accept, you will be denied access to the Application.
+
+The same explicit consent is required to **create an account and to sign in** on the sign-in screen. Account creation and sign-in are blocked, with the message "You must explicitly accept the Privacy Policy to proceed.", until the box is ticked. The date and time of each acceptance is recorded on your device.
