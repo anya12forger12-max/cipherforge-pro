@@ -51,7 +51,13 @@ jobs:
           token_format: access_token
 
       - name: Deploy to Firebase Hosting
-        run: npx -y firebase-tools deploy --only hosting --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive
+        # Pinned to 15.33.0: firebase-tools 15.34.0+ added a serviceusage precheck to
+        # the hosting deploy path (ensureApiEnabled on firebasehosting.googleapis.com)
+        # and the WIF service account lacks serviceusage.services.get, so deploys fail
+        # with 403 "Permission denied to get service". 15.33.0 is the last version
+        # proven green in this pipeline (run 37747548722). Unpin once the SA is granted
+        # roles/serviceusage.serviceUsageViewer.
+        run: npx -y firebase-tools@15.33.0 deploy --only hosting --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive
         env:
           GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
