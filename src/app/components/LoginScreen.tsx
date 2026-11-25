@@ -101,7 +101,7 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
   };
 
   return (
-    <div style={{
+    <div role="dialog" aria-modal="true" aria-label="Sign in" style={{
       position: 'fixed',
       inset: 0,
       background: 'var(--color-background)',

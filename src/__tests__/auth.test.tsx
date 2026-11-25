@@ -271,6 +271,16 @@ describe('LoginScreen sign-in', () => {
 });
 
 describe('App session wiring', () => {
+  it('does not mount the application shell behind the login gate', () => {
+    render(<App />);
+    // A visual overlay alone is not a gate: the background pages stayed in
+    // the tab order and accessibility tree, so Tab + Enter reached Settings,
+    // Recovery and the cipher workspace without credentials.
+    expect(screen.queryByRole('main')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Sign out' })).toBeNull();
+    expect(screen.getByRole('dialog', { name: 'Sign in' })).toBeInTheDocument();
+  });
+
   it('shows the create-account overlay without a session and sign-out returns to sign-in', async () => {
     render(<App />);
     expect(screen.getByRole('heading', { name: /create your account/i })).toBeInTheDocument();

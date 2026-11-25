@@ -147,43 +147,48 @@ function App() {
       style={themeStyles}
       data-theme={currentTheme.id}
     >
-      <Header 
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
-        onSignOut={authenticated ? handleSignOut : undefined}
-        signedInEmail={signedInEmail}
-      />
-      
-      <div className="app-layout">
-        <Sidebar isOpen={sidebarOpen} onNavigate={handleNavigate} currentPage={currentPage} />
-        
-        <main className="main-content" role="main" aria-label="Main content">
-          {currentPage === 'dashboard' && <EducationalDisclaimer />}
-          {renderPage()}
-        </main>
-      </div>
+      {authenticated ? (
+        <>
+          <Header
+            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+            onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+            onSignOut={handleSignOut}
+            signedInEmail={signedInEmail}
+          />
 
-      <NotificationPanel />
+          <div className="app-layout">
+            <Sidebar isOpen={sidebarOpen} onNavigate={handleNavigate} currentPage={currentPage} />
 
-      {commandPaletteOpen && (
-        <CommandPalette
-          isOpen={commandPaletteOpen}
-          onClose={() => setCommandPaletteOpen(false)}
-          onNavigate={handleNavigate}
-        />
-      )}
+            <main className="main-content" role="main" aria-label="Main content">
+              {currentPage === 'dashboard' && <EducationalDisclaimer />}
+              {renderPage()}
+            </main>
+          </div>
 
-      <StatusBar currentPage={currentPage} isOffline={true} />
+          <NotificationPanel />
 
-      {!authenticated && (
+          {commandPaletteOpen && (
+            <CommandPalette
+              isOpen={commandPaletteOpen}
+              onClose={() => setCommandPaletteOpen(false)}
+              onNavigate={handleNavigate}
+            />
+          )}
+
+          <StatusBar currentPage={currentPage} isOffline={true} />
+
+          <FirstLaunchWizard
+            isOpen={wizardOpen}
+            onComplete={() => setWizardOpen(false)}
+            onSkip={() => { localStorage.setItem('cipherforge-onboarded', 'true'); setWizardOpen(false); }}
+          />
+        </>
+      ) : (
+        // The gate must be exclusive: a fixed overlay only blocks pointer
+        // clicks. Keeping the shell mounted left every page focusable and
+        // reachable by keyboard/screen reader without authenticating.
         <LoginScreen onAuthenticated={handleAuthenticated} />
       )}
-
-      <FirstLaunchWizard
-        isOpen={wizardOpen && authenticated}
-        onComplete={() => setWizardOpen(false)}
-        onSkip={() => { localStorage.setItem('cipherforge-onboarded', 'true'); setWizardOpen(false); }}
-      />
     </div>
   );
 }
