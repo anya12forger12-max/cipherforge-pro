@@ -1,98 +1,83 @@
 # CipherForge Pro
 
-Enterprise-grade educational cryptography toolkit. 100% offline, privacy-first.
+A browser-based educational cipher workspace for exploring Caesar and Vigenère ciphers, brute-force key search, and frequency analysis — with local accounts and no backend.
 
-> **Educational Notice:** The Caesar Cipher is historical and **NOT secure** for real-world use. This tool is for learning purposes only.
+> **Educational notice:** Caesar and Vigenère are historical ciphers and are **not secure** for real-world confidentiality. The app displays this disclaimer on the dashboard. Use modern authenticated encryption (for example AES-256-GCM or ChaCha20-Poly1305) for real data.
 
 ## Features
 
-- **Caesar Cipher** — Encrypt, decrypt, brute force, frequency analysis
-- **Enhanced Analysis** — Chi-squared scoring, pattern detection, key length estimation
-- **7 Themes** — Dark, Light, High Contrast, Cyber Green, Midnight Blue, Professional Gray, Color-Blind Friendly
-- **WCAG 2.2 AAA** accessibility compliance
-- **Offline-First** — No network requests, no telemetry, no analytics
-- **Privacy-First** — All data stays on your device
-- **Local Accounts** — Create an account on-device; the email and a salted PBKDF2 password hash never leave the browser
-- **Command Palette** — Ctrl+P for fuzzy command search
-- **First Launch Wizard** — Theme, accessibility, and privacy onboarding
+- **Caesar workspace** — encrypt, decrypt, and brute-force all 26 shifts with shift controls and scored candidate results.
+- **Frequency analysis** — English letter-frequency comparison, chi-squared score, correlation, and top-shift suggestions in `src/core/engines/frequency.ts`.
+- **Vigenère module** — a registered keyword cipher implementation with analysis helpers in `src/core/crypto/vigenere.ts`; the current Workspace screen drives Caesar operations.
+- **Visualizations** — charts and visual views under `src/visualization/`.
+- **Local accounts** — sign-up requires an email, a password of at least 8 characters, a matching confirmation, and an explicit privacy-policy consent checkbox. Passwords are never stored: a 16-byte random salt and PBKDF2-HMAC-SHA256 (150,000 iterations, WebCrypto) produce a digest compared in constant time. Records live only in this browser's `localStorage`; the session survives reloads, and Sign out clears it. Older single-hash accounts are migrated on first successful sign-in. Where WebCrypto is unavailable (plain HTTP, e.g. a LAN IP), the code records and uses a weaker single-pass salted SHA-256 fallback — use HTTPS or localhost for real accounts.
+- **Offline by design** — account records, workspaces, configuration, and history are local; no runtime network calls or analytics are present in `src/`. The repository does contain Firebase/Vercel deployment configuration and a `src/firebase-config.ts` placeholder module that the app does not import.
+- **Seven themes** — Dark, Light, High Contrast, Cyber Green, Midnight Blue, Professional Gray, and Color Blind Friendly.
+- **Keyboard-first UI** — command palette, onboarding wizard, status bar, privacy center, security audit, recovery center, and diagnostics center.
 
-## Accounts
+## Get started
 
-CipherForge Pro asks you to create a **local account** the first time you open it, and it can be created at any time from the sign-in screen via **Create account**. The account exists only in this browser's local storage:
-
-- **Sign-up** requires an email address, a password of at least 8 characters, a matching confirmation, and an explicit tick on "I explicitly accept the Privacy Policy to use CipherForge Pro." Without that tick, sign-up and sign-in are both refused.
-- **Passwords are never stored.** Each account gets a random 16-byte salt, and the password is stretched with PBKDF2-HMAC-SHA256 (150,000 iterations) through WebCrypto. The result is a hex digest compared in constant time.
-- **Nothing is transmitted.** The email, the salt, the digest, the active session, and your consent timestamp all stay in local storage. There is no server, no analytics, and no telemetry.
-- **The session is persisted**, so a page reload keeps you signed in. **Sign out** is in the header; it clears the session only, so you can sign back in.
-- **Legacy installs** (the old single-hash login) are upgraded automatically: the first successful sign-in re-derives your password with PBKDF2 and removes the old key.
-- WebCrypto is only available in a secure context (`https` or `localhost`). Served over plain `http://<LAN-IP>`, the app falls back to a weaker single-pass salted SHA-256 digest and keeps working; the digest that was used is recorded per account.
-
-## Getting Started
+Requires Node.js 20 (the version used in CI).
 
 ```bash
-npm install
+npm install     # or: npm ci to install exactly from package-lock.json
 npm run dev
 ```
+
+Open the local URL printed by Vite. You will be asked to create a local account and can then skip or complete the first-launch wizard.
 
 ## Scripts
 
 | Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
-| `npm run test` | Run tests |
-| `npm run lint` | Run linter |
-| `npm run typecheck` | Type-check without emitting |
+| ------- | ----------- |
+| `npm run dev` | Start the Vite development server |
+| `npm run build` | Type-check project references and build for production |
+| `npm run preview` | Preview the production build locally |
+| `npm run test` | Run Vitest in watch mode |
+| `npm run test:run` | Run Vitest once (used in CI) |
+| `npm run test:coverage` | Run Vitest once with coverage |
+| `npm run lint` | Run ESLint over the repository |
+| `npm run typecheck` | Run `tsc --noEmit` |
 
-## Tech Stack
+`./install.sh` detects `package.json` and runs `npm install` for you.
 
-- React 18 + TypeScript
-- Vite
-- Zustand (state management)
-- Vitest (testing)
-- Lucide React (icons)
+## Project structure
 
-## Project Structure
-
-```
+```text
 src/
+├── app/           # App shell, header, sidebar, command palette, wizard, login
 ├── core/
-│   ├── crypto/          # Cipher engines and registry
-│   ├── engines/         # Caesar, frequency analysis
-│   ├── security/        # Security, privacy, audit, monitoring
-│   ├── services/        # File, workspace, history, cache, plugins
-│   └── types/           # TypeScript type definitions
-├── ui/
-│   ├── components/      # React components
-│   │   ├── common/      # StatusBar, Sidebar, Header, CommandPalette, etc.
-│   │   ├── dashboard/   # Dashboard
-│   │   ├── workspace/   # Cipher workspace
-│   │   ├── settings/    # Settings
-│   │   ├── help/        # Help center
-│   │   ├── visualizations/  # Charts and visualizations
-│   │   ├── privacy/     # Privacy center
-│   │   ├── security/    # Security audit
-│   │   ├── recovery/    # Recovery center
-│   │   └── diagnostics/ # Diagnostics
-│   └── themes/          # Theme definitions and store
-├── stores/              # Zustand stores
-└── __tests__/           # Vitest tests
+│   ├── crypto/    # cipher registry, Vigenère module
+│   ├── engines/   # Caesar, enhanced Caesar, frequency analysis
+│   ├── security/  # local auth, clipboard, integrity, audit, privacy helpers
+│   ├── services/  # workspace, history, cache, search, files, plugins
+│   └── types/     # shared TypeScript types
+├── configuration/ # settings screen and shortcut defaults
+├── dashboard/     # dashboard and educational disclaimer
+├── workspace/     # encrypt/decrypt/brute-force/frequency UI
+├── visualization/ # charts
+├── privacy/       # privacy center page
+├── security/      # security audit and recovery pages
+├── diagnostics/   # diagnostics center
+├── documentation/ # in-app help center
+├── stores/, themes/
+└── __tests__/     # Vitest tests
 ```
 
-## Keyboard Shortcuts
+Shortcuts declared in the UI: `Ctrl+P` command palette, `Ctrl+E` encrypt, `Ctrl+D` decrypt, `Ctrl+B` brute force, `Ctrl+F` frequency analysis, `Ctrl+V` visualizations, `Ctrl+,` settings, and `F1` help.
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+P` | Command Palette |
-| `Ctrl+E` | Encrypt |
-| `Ctrl+D` | Decrypt |
-| `Ctrl+B` | Brute Force |
-| `Ctrl+F` | Frequency Analysis |
-| `Ctrl+V` | Visualizations |
-| `Ctrl+,` | Settings |
-| `F1` | Help |
+## Privacy and safety
 
-## License
+- The account gate is local-only: it is **not** encryption for saved workspaces, which are stored as JSON in `localStorage`. Do not put real secrets or sensitive plaintext into the workspace.
+- `.env.example` contains Firebase placeholders only. Never commit real API keys or tokens.
+- Clearing site data removes accounts, sessions, workspaces, and history. Export anything you want to keep first.
+- This project is for learning and authorized CTF-style exercises, not for protecting confidential information.
 
-MIT
+## License and credits
+
+MIT License. Copyright (c) 2024 CipherForge Pro Contributors. See [LICENSE](LICENSE) for the full text. No upstream fork or third-party attribution is recorded in this repository.
+
+- Security policy: [SECURITY.md](SECURITY.md)
+- Privacy policy: [PRIVACY_POLICY.md](PRIVACY_POLICY.md)
+- Support: [SUPPORT.md](SUPPORT.md)
+- Issues: <https://github.com/anya12forger12-max/cipherforge-pro/issues>
